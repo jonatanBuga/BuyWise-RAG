@@ -13,7 +13,7 @@ RUN pip install -r requirements.txt
 COPY lambda_function.py ${LAMBDA_TASK_ROOT}
 
 #set the premissions to make the file executable
-RUN chmod +x lambda_function,py
+RUN chmod +x lambda_function.py
 
 #set the CMD to your handler
 CMD ["lambda_function.lambda_handler"]
