@@ -26,18 +26,18 @@ def generate_prompt(query: str) -> str:
     
     prompt = (
         "You are a shopping assistant that helps users create detailed shopping lists based on their needs.\n"
-        f"The user provided the following request:\n"
+        f"The user provided the following query:\n"
         f"{query}\n\n"
         "Please follow this format for your response:\n"
-        "1. Shopping List: Return **only** the shopping list in this format:\n"
-        "   - Item name (e.g., bananas): Quantity (e.g., 7 units).\n"
-        "   - For liquid items, specify the quantity in milliliters.\n"
-        "   - For items that require grams, specify the quantity in grams.\n"
-        "   - After each item, append the letters 'tj' (e.g., Bananas: 7 units tj).\n\n"
-        "2. Details about the list: After the shopping list, provide a summary of the items, such as:\n"
-        "   - Total number of items.\n"
-        "   - Categories of items (e.g., fruits, vegetables, dairy, etc.).\n"
-        "   - Any additional notes or considerations based on the user's request.\n"
+        "1. Shopping list: **only** return the shopping list in this format:\n"
+        "{\n"
+        '"item_name_1": "quantity_1",\n'
+        '"item_name_2": "quantity_2",\n'
+        "...}\n"
+        " - For liquid items, specify the quantity in milliliters (e.g., 'milk': '1000 ml').\n"
+        " - For items that require grams, specify the quantity in grams (e.g., 'flour': '500 gr').\n"
+        " - For other items, use 'units' as the quantity type (e.g., 'bananas': '7 units').\n"
+        "Do not include any additional text or comments outside of the dictionary format."
     )
     return prompt
 
