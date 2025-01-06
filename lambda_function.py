@@ -5,12 +5,26 @@ from dotenv import load_dotenv
 from typing import List
 import transformers
 import torch
+import boto3
+import json
+import tiktoken
+from pdf_parser.pdf_to_text import *
+from OCR.process_image import *
+s3 = boto3.client('s3')
+
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..'))) # Add the parent directory to the path sicnce we work with notebooks
 # Load environment variables from a .env file
 load_dotenv()
 
 os.environ["OPENAI_API_KEY"] = os.getenv('OPENAI_API_KEY')
+bucket_name = os.getenv("BUCKET_NAME")
 
+
+def count_tokens(prompt: str) -> int:
+
+    encoding = tiktoken.encoding_for_model("gpt-4")  # לדוגמה, עבור GPT-4
+    tokens = encoding.encode(prompt)
+    return len(tokens)
 def generate_prompt(query: str) -> str:
     """
     Generate a prompt for the LLM using the user's query and retrieved context.
@@ -53,7 +67,7 @@ def get_response(prompt):
             "content": complite_prompt,
         }],
         model="gpt-4o-mini",
-        max_tokens=700
+        max_tokens=count_tokens(complite_prompt)
     )
     generated_text = response.choices[0].message.content
 
@@ -61,9 +75,25 @@ def get_response(prompt):
 
 
 def lambda_handler(event,context):
-    query = event.get("question")
 
-    response = get_response(query)
-    print("response: ",response)
-
-    return {"body": response , "statusCode":200}
+    key = event.get('filename')
+    prompt_from_user = event.get('query')
+    flag = event.get('flag')
+    if flag==1:
+        #check type of file:
+        file_extension = key.split('.')[-1].lower()
+        #reading from s3 file
+        obj_from_s3 = s3.get_object(Bucket=bucket_name,Key=key)
+        file_content = obj_from_s3['Body'].read()
+        #file is pdf
+        if file_extension=="pdf":
+            pdf_processor = pdf_To_Text(file_content)
+            text = pdf_processor.get_text()
+        elif file_extension in ['jpg', 'jpeg', 'png']:
+            ocr_processor = OCR_to_heb(file_content)
+            text = ocr_processor.get_text()
+        result_from_llm = get_response(text)
+    else:
+        result_from_llm = get_response(prompt_from_user)
+    return {"body":result_from_llm,"statusCode":200}
+    

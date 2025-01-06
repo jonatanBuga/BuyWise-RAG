@@ -3,9 +3,13 @@ from pdf_parser.pdf_to_text import pdf_To_Text
 from OCR.process_image import OCR_to_heb
 from lambda_function import *
 def main():
-    promt = 'אני רוצה להכין עוגת שוקולד וזקוק לכל המצרכים. בנוסף, אני צריך גם פירות לארוחת הבוקר והפסקת קפה.'
+    test = {
+        "filename":"",
+        "query":"I want to make a Japanese-style dinner for 3 people.",
+        "flag":0
+    }
 
-    print(get_response(promt))
+    print(lambda_handler(test,None))
     
 
 
