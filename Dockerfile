@@ -12,6 +12,13 @@ RUN pip install -r requirements.txt
 #Copy function code
 COPY lambda_function.py ${LAMBDA_TASK_ROOT}
 
+# Copy the additional modules (directories)
+COPY pdf_parser ${LAMBDA_TASK_ROOT}/pdf_parser
+COPY OCR ${LAMBDA_TASK_ROOT}/OCR
+
+# Copy .env file
+COPY .env ${LAMBDA_TASK_ROOT}/.env
+
 #set the premissions to make the file executable
 RUN chmod +x lambda_function.py
 

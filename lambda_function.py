@@ -7,12 +7,14 @@ import transformers
 import torch
 import boto3
 import json
-import tiktoken
+import re
 from pdf_parser.pdf_to_text import *
 from OCR.process_image import *
 s3 = boto3.client('s3')
 
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..'))) # Add the parent directory to the path sicnce we work with notebooks
+sys.path.append(os.path.join(os.path.dirname(__file__), "pdf_parser"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "OCR"))
 # Load environment variables from a .env file
 load_dotenv()
 
@@ -20,10 +22,8 @@ os.environ["OPENAI_API_KEY"] = os.getenv('OPENAI_API_KEY')
 bucket_name = os.getenv("BUCKET_NAME")
 
 
-def count_tokens(prompt: str) -> int:
-
-    encoding = tiktoken.encoding_for_model("gpt-4")  # לדוגמה, עבור GPT-4
-    tokens = encoding.encode(prompt)
+def count_tokens(text: str) -> int:
+    tokens = re.findall(r'\S+|\n', text)
     return len(tokens)
 def generate_prompt(query: str) -> str:
     """

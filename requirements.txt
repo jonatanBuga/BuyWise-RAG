@@ -5,3 +5,5 @@ torch
 PyPDF2
 supabase
 boto3
+google-cloud-vision
+python-bidi==0.4.2

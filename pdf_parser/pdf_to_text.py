@@ -1,5 +1,4 @@
 import PyPDF2
-import fitz
 from io import BytesIO
 class pdf_To_Text:
     """
