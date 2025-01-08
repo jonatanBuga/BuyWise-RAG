@@ -1,3 +1,4 @@
 .env 
 buywiseocr-6f37a1812afa.json
 __pycache__
+test_pdf_ocr.py
