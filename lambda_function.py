@@ -25,7 +25,7 @@ bucket_name = os.getenv("BUCKET_NAME")
 def count_tokens(text: str) -> int:
     tokens = re.findall(r'\S+|\n', text)
     return len(tokens)
-def generate_prompt(query: str) -> str:
+def generate_prompt(query,text):
     """
     Generate a prompt for the LLM using the user's query and retrieved context.
 
@@ -37,11 +37,15 @@ def generate_prompt(query: str) -> str:
         str: A detailed prompt to be sent to the LLM.
     """
 
-    
+    if text==None:
+        text=""
     prompt = (
         "You are a shopping assistant that helps users create detailed shopping lists based on their needs.\n"
         f"The user provided the following query:\n"
         f"{query}\n\n"
+        f"In addition to the query, the user uploaded a file, which further details his request.\n"
+        f"The file has been converted to a text string and is displayed as follows:{text}\n"
+        f"Please note, if the above text contains nothing, it means that nothing was added and you will only rely on the user's query.\n"
         "Please follow this format for your response:\n"
         "1. Shopping list: **only** return the shopping list in this format:\n"
         "{\n"
@@ -54,22 +58,27 @@ def generate_prompt(query: str) -> str:
         "Do not include any additional text or comments outside of the dictionary format."
     )
     return prompt
-def generate_basic_list_prompt(query):
+def generate_basic_list_prompt(query,text):
+    if text ==None:
+        text=""
     prompt = (
         "You are a shopping assistant that provides a simple shopping list based on the text provided by the user.\n"
         "The following is the user's request:\n"
         f"{query}\n"
+        f"In addition to the query, the user uploaded a file, which further details his request.\n"
+        f"The file has been converted to a text string and is displayed as follows:{text}\n"
+        f"Please note, if the above text contains nothing, it means that nothing was added and you will only rely on the user's query.\n"
         "Please do not analyze beyond what is necessary, do not add any new items, and do not infer additional suggestions.\n"
         "Return only the items mentioned in the text, with the required quantity if needed, each on its own line, "
         "using the following format:\n"
         "{ Item Name : Required Quantity }"
     )
     return prompt
-def get_response(prompt,type):
+def get_response(prompt,type,text=None):
     if type =="full_list":
-        complite_prompt = generate_prompt(prompt)
+        complite_prompt = generate_prompt(prompt,text)
     elif type =="basic_list":
-        complite_prompt = generate_basic_list_prompt(prompt)
+        complite_prompt = generate_basic_list_prompt(prompt,text)
     client = OpenAI(
             api_key=os.environ.get("OPENAI_API_KEY"), 
         )
@@ -106,9 +115,9 @@ def lambda_handler(event,context):
             ocr_processor = OCR_to_heb(file_content)
             text = ocr_processor.get_text()
         if is_basic_list:
-            result_from_llm = get_response(text,"basic_list")
+            result_from_llm = get_response(prompt_from_user,"basic_list",text)
         else:
-            result_from_llm = get_response(text,"full_list")
+            result_from_llm = get_response(prompt_from_user,"full_list",text)
 
     else:
         if is_basic_list:
