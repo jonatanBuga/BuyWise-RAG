@@ -54,9 +54,22 @@ def generate_prompt(query: str) -> str:
         "Do not include any additional text or comments outside of the dictionary format."
     )
     return prompt
-
-def get_response(prompt):
-    complite_prompt = generate_prompt(prompt)
+def generate_basic_list_prompt(query):
+    prompt = (
+        "You are a shopping assistant that provides a simple shopping list based on the text provided by the user.\n"
+        "The following is the user's request:\n"
+        f"{query}\n"
+        "Please do not analyze beyond what is necessary, do not add any new items, and do not infer additional suggestions.\n"
+        "Return only the items mentioned in the text, with the required quantity if needed, each on its own line, "
+        "using the following format:\n"
+        "{ Item Name : Required Quantity }"
+    )
+    return prompt
+def get_response(prompt,type):
+    if type =="full_list":
+        complite_prompt = generate_prompt(prompt)
+    elif type =="basic_list":
+        complite_prompt = generate_basic_list_prompt(prompt)
     client = OpenAI(
             api_key=os.environ.get("OPENAI_API_KEY"), 
         )
@@ -75,11 +88,11 @@ def get_response(prompt):
 
 
 def lambda_handler(event,context):
-
+    is_basic_list = event.get('checkBoxList')#1 mean that user want basic list
     key = event.get('filename')
     prompt_from_user = event.get('query')
     flag = event.get('flag')
-    if flag==1:
+    if flag==1: 
         #check type of file:
         file_extension = key.split('.')[-1].lower()
         #reading from s3 file
@@ -92,8 +105,18 @@ def lambda_handler(event,context):
         elif file_extension in ['jpg', 'jpeg', 'png']:
             ocr_processor = OCR_to_heb(file_content)
             text = ocr_processor.get_text()
-        result_from_llm = get_response(text)
+        if is_basic_list:
+            result_from_llm = get_response(text,"basic_list")
+        else:
+            result_from_llm = get_response(text,"full_list")
+
     else:
-        result_from_llm = get_response(prompt_from_user)
+        if is_basic_list:
+            result_from_llm = get_response(prompt_from_user,"basic_list")
+        else:
+            result_from_llm = get_response(prompt_from_user,"full_list")
+
     return {"body":result_from_llm,"statusCode":200}
+
     
+
