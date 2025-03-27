@@ -13,6 +13,7 @@ from llama_index.core.schema import BaseNode, TransformComponent
 from llama_index.vector_stores.faiss import FaissVectorStore
 from llama_index.core.text_splitter import SentenceSplitter
 from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.schema import Document
 
 load_dotenv()  # Load .env if present
 # OpenAI Key
@@ -37,10 +38,13 @@ class TextCleaner(TransformComponent):
     Replaces tabs, extra newlines, etc.
     """
     def __call__(self, nodes: List[BaseNode], **kwargs) -> List[BaseNode]:
+        new_nodes = []
         for node in nodes:
-            node.text = node.text.replace('\t', ' ')
-            node.text = node.text.replace(' \n', ' ')
-        return nodes
+            old_text = node.get_content()
+            new_text = old_text.replace('\t', ' ').replace(' \n', ' ')
+            new_node = Document(text=new_text, doc_id=node.doc_id, metadata=node.metadata)
+            new_nodes.append(new_node)
+        return new_nodes
 
 def build_retriever(data_path: str) -> VectorStoreIndex:
     """
@@ -50,7 +54,7 @@ def build_retriever(data_path: str) -> VectorStoreIndex:
     3. Store in Faiss
     4. Create and return a VectorStoreIndex with retrieval ability.
     """
-    #Load documents from directory
+    #Load documents from directorya
     node_parser = SimpleDirectoryReader(
         input_dir=data_path, 
         required_exts=['.pdf']
@@ -94,9 +98,9 @@ def retrieve_context(retriever, query: str) -> List[BaseNode]:
     return retriever.retrieve(query)
 
 if __name__ == "__main__":
-    # current_dir = os.path.dirname(os.path.abspath(__file__))
-    # data_path = os.path.join(current_dir, "data/recipes_data.pdf")
-    vstore_index = build_retriever("/Users/jonatanbuga/Desktop/BuyWise-RAG/RAG/data/recipes_data.pdf")
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data_path = os.path.join(current_dir, "data")
+    vstore_index = build_retriever(data_path)
     retriever = get_retriever(vstore_index, top_k=2)
     
     # Test retrieval
