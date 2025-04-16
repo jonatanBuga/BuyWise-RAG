@@ -3,7 +3,6 @@ import sys
 from dotenv import load_dotenv
 from .helper_functions import *
 
-
 # Load environment variables from a .env file
 load_dotenv()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
@@ -15,7 +14,7 @@ os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
 
 
-def encode_pdf(path, chunk_size=1000, chunk_overlap=200):
+def encode_Pdf(path,chunk_size=1000, chunk_overlap=200):
     """
     Encodes a PDF book into a vector store using OpenAI embeddings.
 
@@ -57,7 +56,7 @@ def context_from_query(query):
     if not os.path.exists(pdf_path):
         raise FileNotFoundError(f"PDF not found at {pdf_path}")
     
-    chunks_vector_store = encode_pdf(pdf_path, chunk_size=1000, chunk_overlap=200)
+    chunks_vector_store = encode_Pdf(pdf_path,1000, 200)
 
     #create retriver 
     chunks_query_retriever = chunks_vector_store.as_retriever(search_kwargs={"k": 2})
@@ -66,4 +65,3 @@ def context_from_query(query):
 
     #context is list of 2 items(string,string)
     return context
-

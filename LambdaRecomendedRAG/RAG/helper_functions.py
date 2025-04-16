@@ -1,4 +1,4 @@
-from langchain.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
@@ -13,6 +13,7 @@ import random
 import textwrap
 import numpy as np
 from enum import Enum
+import re
 
 
 def replace_t_with_space(list_of_documents):
@@ -244,7 +245,28 @@ def read_pdf_to_string(path):
         content += page.get_text()
     return content
 
+def split_by_recipe_titles(content):
+    """
+    Split the content of the PDF into chunks based on recipe titles.
 
+    Args:
+        content (str): The full content of the PDF as a string.
+
+    Returns:
+        list: A list of chunks, each containing a full recipe.
+    """
+    # Regular expression to detect recipe titles
+    pattern = re.compile(
+        r'(?=(?:[A-Z][a-z]+(?:\s+[a-zA-Z\(\)\-\'\&]+)*\s?–.+))'  # Title starts with capital and contains description
+    )
+    
+    # Split content into recipes based on the pattern
+    chunks = pattern.split(content)
+    
+    # Remove empty or irrelevant chunks
+    chunks = [chunk.strip() for chunk in chunks if chunk.strip()]
+    
+    return chunks
 def bm25_retrieval(bm25: BM25Okapi, cleaned_texts: List[str], query: str, k: int = 5) -> List[str]:
     """
     Perform BM25 retrieval and return the top k cleaned text chunks.
@@ -352,9 +374,9 @@ def get_langchain_embedding_provider(provider: EmbeddingProvider, model_id: str 
     if provider == EmbeddingProvider.OPENAI:
         from langchain_openai import OpenAIEmbeddings
         return OpenAIEmbeddings()
-    elif provider == EmbeddingProvider.COHERE:
-        from langchain_cohere import CohereEmbeddings
-        return CohereEmbeddings()
+    # elif provider == EmbeddingProvider.COHERE:
+    #     from langchain_cohere import CohereEmbeddings
+    #     return CohereEmbeddings()
     elif provider == EmbeddingProvider.AMAZON_BEDROCK:
         from langchain_community.embeddings import BedrockEmbeddings
         return BedrockEmbeddings(model_id=model_id) if model_id else BedrockEmbeddings(model_id="amazon.titan-embed-text-v2:0")

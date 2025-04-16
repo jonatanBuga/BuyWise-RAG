@@ -26,11 +26,10 @@ def generate_user_input(list_from_llm):
         str: A detailed prompt to be sent to embeding model.
     """
     prompt = (
-        "Recipes including ingredients: "
-        f"{list_from_llm}. "
-        "Cooking suggestions, meals, dishes, food preparation ideas. "
-        "Culinary options matching the listed ingredients. "
-        "Relevant meal ideas."
+        f"I have the following ingredients available: {list_from_llm}. "
+        "Please suggest possible recipes that include most or all of these ingredients. "
+        "Include relevant cooking instructions, preparation tips, and flavor descriptions. "
+        "Write the suggestions in a style similar to a cooking blog or cookbook."
     )
     return prompt
 
@@ -85,3 +84,17 @@ def lambda_handler(event,context):
 
     response = get_response(P_augmentition)
     return {"body":response,"statusCode":200}
+
+
+def main():
+    query ="\n\"chicken breast\": \"800 gr\",\n\"spinach\": \"400 gr\",\n\"garlic\": \"4 units\",\n\"olive oil\": \"200 ml\",\n\"salt\": \"to taste\",\n\"black pepper\": \"to taste\",\n\"lemon\": \"2 units\",\n\"parmesan cheese\": \"100 gr\",\n\"pasta\": \"400 gr\",\n\"tomato sauce\": \"400 ml\",\n\"carrots\": \"2 units\",\n\"onion\": \"1 unit\",\n\"bell peppers\": \"2 units\",\n\"herbs (basil, thyme)\": \"to taste\",\n\"bread\": \"1 loaf\"\n"
+    user_input = generate_user_input(query)
+
+    #retriver_context is list!!!
+    retriver_context = context_from_query(user_input)
+    for doc in retriver_context:
+        print("doc context:")
+        print(doc+'\n')
+
+if __name__ =="__main__":
+    main()

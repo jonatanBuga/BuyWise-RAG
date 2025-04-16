@@ -30,7 +30,8 @@ llama-index-vector-stores-faiss==0.2.1
 llama-parse==0.5.2
 langchain
 langchain-community
-langchain_openai
+langchain_openai==0.1.23
+langchain-core==0.2.38
 rank_bm25
 PyMuPDF
 selenium

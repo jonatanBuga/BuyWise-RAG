@@ -97,7 +97,7 @@ def get_response(prompt,type,text=None):
 
 
 def lambda_handler(event,context):
-    is_basic_list = event.get('checkBoxList')#1 mean that user want basic list
+    is_basic_list = event.get('checkBoxList') #1 mean that user want basic list
     key = event.get('filename')
     prompt_from_user = event.get('query')
     flag = event.get('flag')
