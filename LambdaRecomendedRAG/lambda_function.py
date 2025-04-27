@@ -52,6 +52,17 @@ def prompt_augmentition(context,user_input):
         "Additionally, provide recipe ideas based on the available data.\n"
         "Finally, you must return a detailed list of products required for these meal ideas in the following format:\n"
         "Item name: Quantity\n"
+        "----- OUTPUT FORMAT (strict) -----\n"
+        "For **each** recipe output **exactly** this block (no extra text):\n\n"
+        "# <Recipe Name>\n"
+        "* <Short description in one sentence>\n"
+        "- מצרכים:\n"
+        "  <Ingredient 1>: <Quantity>\n"
+        "  <Ingredient 2>: <Quantity>\n"
+        "  ...\n\n"
+        "Repeat the block above for every suggested recipe.\n"
+        "Do NOT add headings, numbering, or any text outside these blocks.\n"
+        "---------------------------------------------------------\n"
     )
 
     return augmented_prompt

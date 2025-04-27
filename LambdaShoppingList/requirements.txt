@@ -10,8 +10,9 @@ python-bidi==0.4.2
 llama-index
 faiss-cpu
 fpdf2
+setuptools
 python-bidi
-numpy==1.24.3
+numpy==1.26.4
 llama-cloud==0.0.17
 llama-index==0.11.7
 llama-index-agent-openai==0.3.1
