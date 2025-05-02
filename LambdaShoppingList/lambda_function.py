@@ -40,60 +40,50 @@ def generate_prompt(query,text):
     if text==None:
         text=""
     prompt = (
-    "You are a shopping assistant that builds a precise shopping list based only on the user’s request "
-    "and any uploaded file text. Do NOT add or infer any extra items.\n\n"
+    "You are a grocery-list assistant.\n"
+    "Build an accurate shopping list based ONLY on:\n"
+    "1) the user’s free-text request, and\n"
+    "2) any text extracted from an uploaded file (ignore if empty).\n\n"
+
+    "• Include every product explicitly named *and* any core ingredients that are "
+    "logically required for a clearly stated dish, cuisine, or meal.  "
+    "– Example: an “Italian dinner” implies pasta, tomatoes, olive oil, basil, etc.\n"
+    "• Do NOT add items that are not evidently relevant.\n"
+    "• Preserve stated quantities; if none, assign a reasonable default (e.g. 1 pkg / 500 g / 1 kg).\n\n"
+
     "User request:\n"
     f"{query}\n\n"
-    "Uploaded file text (if empty, ignore):\n"
+    "Uploaded file text:\n"
     f"{text}\n\n"
-    "Extract only the products explicitly mentioned, preserving required quantities when specified "
-    "(or assign a reasonable default if none given).\n\n"
-    "Then output a single JSON object whose keys are department names and whose values are lists of items "
-    "for that department. Use exactly these departments (and no others):\n"
-    "['baby_products', 'bakery', 'beverages', 'cleaning_products', 'dairy_products', "
-    "'dry_goods', 'frozen_foods', 'fruits_and_vegetables', 'health_and_beauty', "
-    "'home_and_garden', 'meat_and_fish', 'pet_products', 'ready_meals', "
-    "'snacks_and_sweets', 'spices_and_additives']\n\n"
-    "– Do NOT include a department key if it has no matching items.\n"
-    "– Each item entry should be an object with 'name' and 'quantity'.\n\n"
-    "Output format (valid JSON):\n"
-    "{\n"
-    '  "department_name": [\n'
-    '    { "name": "Item A", "quantity": "X" },\n'
-    '    { "name": "Item B", "quantity": "Y" }\n'
-    '  ],\n'
-    '  "another_department": [ ... ]\n'
-    "}\n"
+
+    "Return the list as plain text—one line per item—in EXACTLY this format, in English only:\n"
+    "{ Item Name : Required Quantity }\n"
+    "Do not output anything before or after the list, and do not wrap it in JSON."
     )
     return prompt
 def generate_basic_list_prompt(query,text):
     if text ==None:
         text=""
     prompt = (
-    "You are a shopping assistant that builds a precise shopping list based only on the user’s request "
-    "and any uploaded file text. Do NOT add or infer any extra items.\n\n"
+    "You are a grocery-list assistant.\n"
+    "Build an accurate shopping list based ONLY on:\n"
+    "1) the user’s free-text request, and\n"
+    "2) any text extracted from an uploaded file (ignore if empty).\n\n"
+
+    "• Include every product explicitly named *and* any core ingredients that are "
+    "logically required for a clearly stated dish, cuisine, or meal.  "
+    "– Example: an “Italian dinner” implies pasta, tomatoes, olive oil, basil, etc.\n"
+    "• Do NOT add items that are not evidently relevant.\n"
+    "• Preserve stated quantities; if none, assign a reasonable default (e.g. 1 pkg / 500 g / 1 kg).\n\n"
+
     "User request:\n"
     f"{query}\n\n"
-    "Uploaded file text (if empty, ignore):\n"
+    "Uploaded file text:\n"
     f"{text}\n\n"
-    "Extract only the products explicitly mentioned, preserving required quantities when specified "
-    "(or assign a reasonable default if none given).\n\n"
-    "Then output a single JSON object whose keys are department names and whose values are lists of items "
-    "for that department. Use exactly these departments (and no others):\n"
-    "['baby_products', 'bakery', 'beverages', 'cleaning_products', 'dairy_products', "
-    "'dry_goods', 'frozen_foods', 'fruits_and_vegetables', 'health_and_beauty', "
-    "'home_and_garden', 'meat_and_fish', 'pet_products', 'ready_meals', "
-    "'snacks_and_sweets', 'spices_and_additives']\n\n"
-    "– Do NOT include a department key if it has no matching items.\n"
-    "– Each item entry should be an object with 'name' and 'quantity'.\n\n"
-    "Output format (valid JSON):\n"
-    "{\n"
-    '  "department_name": [\n'
-    '    { "name": "Item A", "quantity": "X" },\n'
-    '    { "name": "Item B", "quantity": "Y" }\n'
-    '  ],\n'
-    '  "another_department": [ ... ]\n'
-    "}\n"
+
+    "Return the list as plain text—one line per item—in EXACTLY this format, in English only:\n"
+    "{ Item Name : Required Quantity }\n"
+    "Do not output anything before or after the list, and do not wrap it in JSON."
     )
     return prompt
 def get_response(prompt,type,text=None):
@@ -110,7 +100,7 @@ def get_response(prompt,type,text=None):
             "role": "user",
             "content": complite_prompt,
         }],
-        model="o4-mini",
+        model="gpt-4.1-mini",
         
     )
     generated_text = response.choices[0].message.content
