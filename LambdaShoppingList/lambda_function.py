@@ -51,6 +51,10 @@ def generate_prompt(query,text):
     "• Do NOT add items that are not evidently relevant.\n"
     "• Preserve stated quantities; if none, assign a reasonable default (e.g. 1 pkg / 500 g / 1 kg).\n\n"
 
+    "— Quantity formatting rules —\n"
+        "• Raw products (produce, dry goods, dairy, canned goods, etc.): specify quantity in grams.\n"
+        "• Liquids: specify quantity in milliliters (ml).\n"
+        "• Single-count items (tools, individual pieces, eggs, etc.): specify quantity in units.\n\n"
     "User request:\n"
     f"{query}\n\n"
     "Uploaded file text:\n"
