@@ -18,7 +18,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "OCR"))
 # Load environment variables from a .env file
 load_dotenv()
 
-os.environ["OPENAI_API_KEY"] = os.getenv('OPENAI_API_KEY')
+openai_api_key = os.getenv("OPENAI_API_KEY")
 bucket_name = os.getenv("BUCKET_NAME")
 
 
@@ -96,7 +96,7 @@ def get_response(prompt,type,text=None):
     elif type =="basic_list":
         complite_prompt = generate_basic_list_prompt(prompt,text)
     client = OpenAI(
-            api_key=os.environ.get("OPENAI_API_KEY"), 
+            api_key=openai_api_key, 
         )
 
     response = client.chat.completions.create(
